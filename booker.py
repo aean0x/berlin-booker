@@ -67,7 +67,7 @@ async def book_appointment(cutoff_date, url, path):
             print(f"Current page type after navigating: {current_page_type}")
 
             if current_page_type == None:
-                print(f"Wrong page detected. Starting over in {timeout_seconds}...")
+                print(f"Wrong page detected. Starting over in {timeout_seconds} seconds...")
                 await asyncio.sleep(timeout_seconds)
                 continue
 
@@ -84,7 +84,7 @@ async def book_appointment(cutoff_date, url, path):
                     current_page_type = await page_type(page)
                     break
                 except Exception as e:
-                    print(f"Calendar not found. Starting over in {timeout_seconds}...")
+                    print(f"Calendar not found. Starting over in {timeout_seconds} seconds...")
                     await asyncio.sleep(timeout_seconds)
                     await page.reload()
                     continue
@@ -95,7 +95,7 @@ async def book_appointment(cutoff_date, url, path):
                 print(f"Current page type after waiting for calendar: {current_page_type}")
 
                 if current_page_type != "calendar":
-                    print(f"Wrong page detected after waiting for calendar. Starting over in {timeout_seconds}...")
+                    print(f"Wrong page detected after waiting for calendar. Starting over in {timeout_seconds} seconds...")
                     await asyncio.sleep(timeout_seconds)
                     continue
 
@@ -128,7 +128,7 @@ async def book_appointment(cutoff_date, url, path):
                     print(f"Current page type after waiting for timetable: {current_page_type}")
 
                     if current_page_type != "timeslot":
-                        print(f"Wrong page detected after waiting for timetable. Starting over in {timeout_seconds}...")
+                        print(f"Wrong page detected after waiting for timetable. Starting over in {timeout_seconds} seconds...")
                         await asyncio.sleep(timeout_seconds)
                         continue
 
@@ -146,7 +146,7 @@ async def book_appointment(cutoff_date, url, path):
                         print(f"Current page type after selecting timeslot: {current_page_type}")
 
                         if current_page_type == None:
-                            print(f"Unexpected page type after selecting timeslot. Starting over in {timeout_seconds}...")
+                            print(f"Unexpected page type after selecting timeslot. Starting over in {timeout_seconds} seconds...")
                             await asyncio.sleep(timeout_seconds)
                             continue
                         
