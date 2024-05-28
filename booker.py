@@ -85,7 +85,7 @@ async def book_appointment(cutoff_date, url, path):
                     print(f"An error occurred, retrying: {e}")
                     await asyncio.sleep(timeout_seconds)
                     await page.reload()
-                await asyncio.sleep(1)  # Check every second
+                await asyncio.sleep(5)  # Check every 5 seconds
                 current_page_type = await page_type(page)
 
             if current_page_type != "calendar":
