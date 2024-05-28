@@ -3,9 +3,9 @@ from pyppeteer import launch
 from datetime import datetime
 import winsound
 
-cutoff_date = "31.05.2024" # Latest date to book an appointment in the format "dd.mm.yyyy"
-url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/" # URL of the appointment booking page
-path = "C:/Program Files/Google/Chrome/Application/chrome.exe" # path to your Chrome or Chromium executable
+cutoff_date = "31.05.2024"  # Latest date to book an appointment in the format "dd.mm.yyyy"
+url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/"  # URL of the appointment booking page
+path = "C:/Program Files/Google/Chrome/Application/chrome.exe"  # path to your Chrome or Chromium executable
 
 async def navigate_and_check(page, url):
     await page.goto(url)
@@ -35,15 +35,15 @@ async def page_type(page):
             document.querySelector('.alert.alert-error p').innerText.includes('Leider konnte der ausgewählte Termin nicht reserviert werden.');
     }''')
 
-    if is_calendar_page:
+    if (is_calendar_page):
         return "calendar"
-    elif is_no_appointments_page:
+    elif (is_no_appointments_page):
         return "no-appointments"
-    elif is_timeslot_page:
+    elif (is_timeslot_page):
         return "timeslot"
-    elif is_form_page:
+    elif (is_form_page):
         return "form"
-    elif is_error_page:
+    elif (is_error_page):
         return "error"
     else:
         return None
@@ -66,7 +66,7 @@ async def book_appointment(cutoff_date, url, path):
             current_page_type = await page_type(page)
             print(f"Current page type after navigating: {current_page_type}")
 
-            if current_page_type == None:
+            if current_page_type is None:
                 print(f"Wrong page detected. Starting over in {timeout_seconds} seconds...")
                 await asyncio.sleep(timeout_seconds)
                 continue
@@ -76,21 +76,22 @@ async def book_appointment(cutoff_date, url, path):
                 try:
                     button_disabled = await page.evaluate(f'document.querySelector("{button_selector}").disabled')
                     if button_disabled:
+                        print("Button is disabled. Waiting and retrying...")
                         await asyncio.sleep(timeout_seconds)
+                        continue
                     
                     print("Button enabled. Clicking the button...")
                     await page.click(button_selector)
-                    await page.waitForSelector('.calendar-month-table', {'timeout': 2000})  # Ensure calendar is loaded
+                    await page.waitForSelector('.calendar-month-table', {'timeout': 5000})  # Ensure calendar is loaded
                     current_page_type = await page_type(page)
-                    break
                 except Exception as e:
-                    print(f"Calendar not found. Starting over in {timeout_seconds} seconds...")
+                    print(f"Calendar not found. Starting over in {timeout_seconds} seconds. Error: {e}")
                     await asyncio.sleep(timeout_seconds)
                     await page.reload()
                     continue
 
             if current_page_type == "calendar":
-                await page.waitForSelector('.calendar-month-table', {'timeout': 2000})  # Ensure calendar is loaded
+                await page.waitForSelector('.calendar-month-table', {'timeout': 5000})  # Ensure calendar is loaded
                 current_page_type = await page_type(page)
                 print(f"Current page type after waiting for calendar: {current_page_type}")
 
@@ -122,7 +123,7 @@ async def book_appointment(cutoff_date, url, path):
 
                     # Step 4: Wait for the timetable to load and select the first available slot
                     print("Waiting for the timetable to load...")
-                    await page.waitForSelector('.timetable', {'timeout': 2000})  # Ensure timetable is loaded
+                    await page.waitForSelector('.timetable', {'timeout': 5000})  # Ensure timetable is loaded
 
                     current_page_type = await page_type(page)
                     print(f"Current page type after waiting for timetable: {current_page_type}")
@@ -145,7 +146,7 @@ async def book_appointment(cutoff_date, url, path):
                         current_page_type = await page_type(page)
                         print(f"Current page type after selecting timeslot: {current_page_type}")
 
-                        if current_page_type == None:
+                        if current_page_type is None:
                             print(f"Unexpected page type after selecting timeslot. Starting over in {timeout_seconds} seconds...")
                             await asyncio.sleep(timeout_seconds)
                             continue
@@ -155,7 +156,8 @@ async def book_appointment(cutoff_date, url, path):
                             try:
                                 await page.click('a[href="/terminvereinbarung/termin/day/"]')
                                 continue
-                            except:
+                            except Exception as e:
+                                print(f"Error clicking back to day view: {e}")
                                 await asyncio.sleep(timeout_seconds)
                                 continue
 
