@@ -84,7 +84,7 @@ async def book_appointment(cutoff_date, url, path):
                     current_page_type = await page_type(page)
                     break
                 except Exception as e:
-                    print(f"Calendar not found. Starting over...")
+                    print(f"Calendar not found. Starting over in {timeout_seconds}...")
                     await asyncio.sleep(timeout_seconds)
                     await page.reload()
                     continue
