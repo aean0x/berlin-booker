@@ -3,7 +3,7 @@ from pyppeteer import launch
 from datetime import datetime
 import winsound
 
-cutoff_date = "31.07.2024" # Latest date to book an appointment in the format "dd.mm.yyyy"
+cutoff_date = "31.05.2024" # Latest date to book an appointment in the format "dd.mm.yyyy"
 url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/" # URL of the appointment booking page
 path = "C:/Program Files/Google/Chrome/Application/chrome.exe" # path to your Chrome or Chromium executable
 timeout_seconds = 30  # Timeout before refreshing and retrying
@@ -88,15 +88,16 @@ async def book_appointment(cutoff_date, url, path):
                 current_page_type = await page_type(page)
 
             if current_page_type != "calendar":
-                print("Wrong page detected after button press. Starting over...")
-                await asyncio.sleep(timeout_seconds)
-                continue
+                try:
+                    await page.waitForSelector('.calendar-month-table', {'timeout': 60000})  # Ensure calendar is loaded
+                    current_page_type = await page_type(page)
+                except:
+                    print("Wrong page detected after button press. Starting over...")
+                    await asyncio.sleep(timeout_seconds)
+                    continue
+                break
 
             if current_page_type == "calendar":
-                # Step 3: Wait for the calendar to load and find an available date within the threshold
-                print("Waiting for the calendar to load...")
-                await page.waitForSelector('.calendar-month-table', {'timeout': 60000})  # Ensure calendar is loaded
-
                 current_page_type = await page_type(page)
                 print(f"Current page type after waiting for calendar: {current_page_type}")
 
