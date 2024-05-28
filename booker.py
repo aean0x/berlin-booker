@@ -67,7 +67,7 @@ async def book_appointment(cutoff_date, url, path):
             print(f"Current page type after navigating: {current_page_type}")
 
             if current_page_type == None:
-                print("Wrong page detected. Starting over...")
+                print(f"Wrong page detected. Starting over in {timeout_seconds}...")
                 await asyncio.sleep(timeout_seconds)
                 continue
 
@@ -95,7 +95,7 @@ async def book_appointment(cutoff_date, url, path):
                 print(f"Current page type after waiting for calendar: {current_page_type}")
 
                 if current_page_type != "calendar":
-                    print("Wrong page detected after waiting for calendar. Starting over...")
+                    print(f"Wrong page detected after waiting for calendar. Starting over in {timeout_seconds}...")
                     await asyncio.sleep(timeout_seconds)
                     continue
 
@@ -128,7 +128,7 @@ async def book_appointment(cutoff_date, url, path):
                     print(f"Current page type after waiting for timetable: {current_page_type}")
 
                     if current_page_type != "timeslot":
-                        print("Wrong page detected after waiting for timetable. Starting over...")
+                        print(f"Wrong page detected after waiting for timetable. Starting over in {timeout_seconds}...")
                         await asyncio.sleep(timeout_seconds)
                         continue
 
@@ -146,7 +146,7 @@ async def book_appointment(cutoff_date, url, path):
                         print(f"Current page type after selecting timeslot: {current_page_type}")
 
                         if current_page_type == None:
-                            print("Unexpected page type after selecting timeslot. Starting over...")
+                            print(f"Unexpected page type after selecting timeslot. Starting over in {timeout_seconds}...")
                             await asyncio.sleep(timeout_seconds)
                             continue
                         
