@@ -8,6 +8,7 @@ url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/" # URL of
 path = "C:/Program Files/Google/Chrome/Application/chrome.exe" # path to your Chrome or Chromium executable
 timeout_seconds = 30  # Timeout before refreshing and retrying
 
+
 async def navigate_and_check(page, url):
     await page.goto(url)
     await page.waitForSelector('body', {'timeout': 60000})
@@ -98,6 +99,7 @@ async def book_appointment(cutoff_date, url, path):
                 break
 
             if current_page_type == "calendar":
+                await page.waitForSelector('.calendar-month-table', {'timeout': 60000})  # Ensure calendar is loaded
                 current_page_type = await page_type(page)
                 print(f"Current page type after waiting for calendar: {current_page_type}")
 
