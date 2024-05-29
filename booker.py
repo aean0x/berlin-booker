@@ -3,6 +3,7 @@ from pyppeteer import launch
 from datetime import datetime
 import winsound
 
+start_date = "01.06.2024"  # Earliest date to book an appointment in the format "dd.mm.yyyy"
 cutoff_date = "31.05.2024"  # Latest date to book an appointment in the format "dd.mm.yyyy"
 url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/"  # URL of the appointment booking page
 path = "C:/Program Files/Google/Chrome/Application/chrome.exe"  # path to your Chrome or Chromium executable
@@ -48,8 +49,9 @@ async def page_type(page):
     else:
         return None
 
-async def book_appointment(cutoff_date, url, path):
-    # Convert cutoff_date to datetime object
+async def book_appointment(start_date, cutoff_date, url, path):
+    # Convert start_date and cutoff_date to datetime objects
+    earliest_date = datetime.strptime(start_date, "%d.%m.%Y").date()
     latest_date = datetime.strptime(cutoff_date, "%d.%m.%Y").date()
     timeout_seconds = 61
 
@@ -100,22 +102,23 @@ async def book_appointment(cutoff_date, url, path):
                     await asyncio.sleep(timeout_seconds)
                     continue
 
-                available_date_url = await page.evaluate(r'''(cutoff_date) => {
+                available_date_url = await page.evaluate(r'''(earliestDate, latestDate) => {
                     const availableDates = document.querySelectorAll('.calendar-table .buchbar a');
                     if (availableDates.length > 0) {
                         for (let dateLink of availableDates) {
                             const dateText = dateLink.title.match(/(\d{2}\.\d{2}\.\d{4})/)[0];  // Extract date from title
                             const dateParts = dateText.split('.');
                             const date = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
-                            const latest_date = new Date(cutoff_date.split('.').reverse().join('-'));
+                            const earliest_date = new Date(earliestDate.split('.').reverse().join('-'));
+                            const latest_date = new Date(latestDate.split('.').reverse().join('-'));
 
-                            if (date <= latest_date) {
+                            if (date >= earliest_date && date <= latest_date) {
                                 return dateLink.href;
                             }
                         }
                     }
                     return null;
-                }''', cutoff_date)
+                }''', start_date, cutoff_date)
 
                 if available_date_url:
                     print(f"Found available date URL: {available_date_url}")
@@ -179,7 +182,7 @@ async def book_appointment(cutoff_date, url, path):
 # This part ensures compatibility with different Python versions and environments
 if __name__ == '__main__':
     try:
-        asyncio.run(book_appointment(cutoff_date, url, path))
+        asyncio.run(book_appointment(start_date, cutoff_date, url, path))
     except AttributeError:
         loop = asyncio.get_event_loop()
-        loop.run_until_complete(book_appointment(cutoff_date, url, path))
+        loop.run_until_complete(book_appointment(start_date, cutoff_date, url, path))
