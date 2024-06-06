@@ -3,8 +3,8 @@ from pyppeteer import launch
 from datetime import datetime
 import winsound
 
-start_date = "01.06.2024"  # Earliest date to book an appointment in the format "dd.mm.yyyy"
-cutoff_date = "31.05.2024"  # Latest date to book an appointment in the format "dd.mm.yyyy"
+start_date = "07.06.2024"  # Earliest date to book an appointment in the format "dd.mm.yyyy"
+cutoff_date = "08.06.2024"  # Latest date to book an appointment in the format "dd.mm.yyyy"
 url = "https://service.berlin.de/terminvereinbarung/termin/all/327537/"  # URL of the appointment booking page
 path = "C:/Program Files/Google/Chrome/Application/chrome.exe"  # path to your Chrome or Chromium executable
 
@@ -53,7 +53,7 @@ async def book_appointment(start_date, cutoff_date, url, path):
     # Convert start_date and cutoff_date to datetime objects
     earliest_date = datetime.strptime(start_date, "%d.%m.%Y").date()
     latest_date = datetime.strptime(cutoff_date, "%d.%m.%Y").date()
-    timeout_seconds = 61
+    timeout_seconds = 101
 
     browser = await launch(headless=False, executablePath=path)  # Specify the path to your Chromium or Chrome executable
     page = await browser.newPage()
